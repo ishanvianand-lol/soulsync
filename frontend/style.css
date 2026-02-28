@@ -1,0 +1,66 @@
+body {
+margin: 0;
+font-family: Arial, sans-serif;
+background: linear-gradient(135deg, #6a8cff, #a1c4fd);
+display: flex;
+justify-content: center;
+align-items: center;
+height: 100vh;
+}
+
+.container {
+text-align: center;
+width: 400px;
+}
+
+h1 {
+color: white;
+margin-bottom: 5px;
+}
+
+.tagline {
+color: #f0f0f0;
+margin-bottom: 20px;
+}
+
+.card {
+background: white;
+padding: 20px;
+margin-bottom: 20px;
+border-radius: 10px;
+box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+input {
+width: 100%;
+padding: 10px;
+margin-bottom: 10px;
+}
+
+button {
+width: 100%;
+padding: 10px;
+margin-top: 5px;
+background: #6a8cff;
+color: white;
+border: none;
+border-radius: 5px;
+cursor: pointer;
+}
+
+button.voice {
+background: #ff7a7a;
+}
+
+button:hover {
+opacity: 0.9;
+}
+
+audio {
+width: 100%;
+margin-top: 10px;
+}
+
+#story {
+text-align: left;
+}

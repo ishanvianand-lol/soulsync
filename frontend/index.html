@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SoulSync — Soul Healing Through Sound</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --rose:#f4c5c5;--peach:#f9dfc1;--lavender:#ddd4f0;--mint:#c5e8d9;--sky:#c8dff5;
+  --cream:#fdf8f3;--muted:#9b8ea6;--dark:#3d3047;
+  --card:rgba(255,255,255,0.62);--blur:blur(20px);--r:22px;
+  --shadow:0 8px 32px rgba(100,80,130,0.12);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--dark);min-height:100vh;overflow-x:hidden}
+
+.orbs{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:0.5;animation:drift 18s ease-in-out infinite alternate}
+.orb1{width:500px;height:500px;background:var(--lavender);top:-150px;left:-120px;animation-delay:0s}
+.orb2{width:400px;height:400px;background:var(--rose);top:35%;right:-100px;animation-delay:-7s}
+.orb3{width:320px;height:320px;background:var(--mint);bottom:-60px;left:20%;animation-delay:-13s}
+.orb4{width:280px;height:280px;background:var(--peach);bottom:15%;right:8%;animation-delay:-4s}
+@keyframes drift{to{transform:translate(28px,22px) scale(1.07)}}
+
+.shell{display:grid;grid-template-columns:256px 1fr;min-height:100vh;position:relative;z-index:1}
+
+/* SIDEBAR */
+aside{display:flex;flex-direction:column;padding:32px 20px;background:rgba(255,255,255,0.42);backdrop-filter:var(--blur);border-right:1px solid rgba(255,255,255,0.65);gap:6px}
+.logo{font-family:'Playfair Display',serif;font-size:1.55rem;color:var(--dark);margin-bottom:28px;display:flex;align-items:center;gap:10px}
+.logo-icon{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--rose),var(--lavender));display:grid;place-items:center;font-size:18px;flex-shrink:0}
+.nav-label{font-size:0.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);padding:0 10px;margin:14px 0 4px}
+.nav-item{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:14px;cursor:pointer;transition:all .18s;color:var(--muted);font-size:0.88rem;border:none;background:none;width:100%;text-align:left;font-family:'DM Sans',sans-serif}
+.nav-item:hover{background:rgba(255,255,255,.75);color:var(--dark)}
+.nav-item.active{background:rgba(255,255,255,.92);color:var(--dark);font-weight:500;box-shadow:var(--shadow)}
+.nav-icon{font-size:1.1rem;width:20px;text-align:center}
+.sidebar-spacer{flex:1}
+.api-config{background:rgba(255,255,255,.6);border-radius:16px;padding:14px;border:1px solid rgba(255,255,255,.8);box-shadow:var(--shadow)}
+.api-label{font-size:0.7rem;color:var(--muted);margin-bottom:6px;font-weight:500}
+.api-input{width:100%;border:1px solid rgba(180,160,200,.3);border-radius:10px;padding:8px 10px;font-size:0.78rem;color:var(--dark);background:rgba(255,255,255,.7);outline:none;font-family:'DM Sans',sans-serif}
+.api-input:focus{border-color:rgba(180,160,200,.6);background:white}
+
+/* MAIN */
+main{display:flex;flex-direction:column;overflow:hidden}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:28px 36px 0}
+.greeting{font-family:'Playfair Display',serif;font-size:1.75rem;color:var(--dark)}
+.greeting em{font-style:italic;color:var(--muted)}
+.main-tabs{display:flex;gap:8px;padding:18px 36px 0}
+.tab{padding:8px 20px;border-radius:99px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.84rem;font-weight:500;background:rgba(255,255,255,.55);color:var(--muted);transition:all .2s;backdrop-filter:blur(10px)}
+.tab:hover{background:rgba(255,255,255,.8);color:var(--dark)}
+.tab.active{background:rgba(255,255,255,.95);color:var(--dark);box-shadow:var(--shadow)}
+.content{padding:20px 36px 36px;flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:20px}
+.content::-webkit-scrollbar{width:6px}
+.content::-webkit-scrollbar-thumb{background:rgba(155,142,166,.22);border-radius:99px}
+
+/* PAGES */
+.page{display:none;flex-direction:column;gap:20px;animation:fadeUp .4s both}
+.page.active{display:flex}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+/* CARDS */
+.card{background:var(--card);backdrop-filter:var(--blur);border-radius:var(--r);padding:26px;border:1px solid rgba(255,255,255,.82);box-shadow:var(--shadow)}
+.card-title{font-family:'Playfair Display',serif;font-size:1.1rem;margin-bottom:4px}
+.card-sub{font-size:0.78rem;color:var(--muted);margin-bottom:18px}
+
+/* INPUTS */
+.text-input{width:100%;border:1.5px solid rgba(180,160,200,.25);border-radius:16px;padding:16px;resize:none;font-family:'DM Sans',sans-serif;font-size:0.92rem;color:var(--dark);outline:none;line-height:1.65;height:110px;background:rgba(255,255,255,.55);transition:all .2s}
+.text-input:focus{border-color:rgba(180,160,200,.55);background:rgba(255,255,255,.9)}
+.text-input::placeholder{color:var(--muted)}
+
+/* BUTTONS */
+.btn{padding:11px 24px;border-radius:99px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.88rem;font-weight:500;transition:all .2s;display:inline-flex;align-items:center;gap:8px}
+.btn-primary{background:linear-gradient(135deg,var(--rose),var(--lavender));color:var(--dark);box-shadow:0 4px 18px rgba(180,150,200,.3)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(180,150,200,.4)}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.btn-secondary{background:rgba(255,255,255,.75);color:var(--dark);box-shadow:var(--shadow)}
+.btn-secondary:hover{background:white}
+
+/* GRID */
+.row{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+
+/* RESULT CARD */
+.result-card{background:linear-gradient(135deg,rgba(221,212,240,.55),rgba(200,223,245,.45));backdrop-filter:var(--blur);border-radius:var(--r);padding:26px;border:1px solid rgba(255,255,255,.8);box-shadow:var(--shadow);display:none;animation:fadeUp .45s both}
+.result-card.show{display:block}
+.mood-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 18px;border-radius:99px;background:rgba(255,255,255,.8);font-weight:500;font-size:0.9rem;box-shadow:var(--shadow);margin-bottom:20px}
+.result-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:20px}
+.result-item{background:rgba(255,255,255,.6);border-radius:16px;padding:16px;text-align:center;border:1px solid rgba(255,255,255,.85)}
+.result-item-label{font-size:0.65rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:6px}
+.result-item-val{font-family:'Playfair Display',serif;font-size:0.95rem;color:var(--dark);line-height:1.3}
+.result-item-icon{font-size:1.6rem;margin-bottom:6px}
+
+/* AUDIO PLAYER */
+.audio-player{background:rgba(255,255,255,.7);border-radius:18px;padding:16px 20px;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow)}
+.play-circle{width:46px;height:46px;border-radius:50%;border:none;cursor:pointer;background:linear-gradient(135deg,var(--rose),var(--lavender));display:grid;place-items:center;font-size:1rem;box-shadow:0 4px 16px rgba(180,150,200,.35);transition:transform .15s;flex-shrink:0}
+.play-circle:hover{transform:scale(1.1)}
+.track-info{flex:1;min-width:0}
+.track-name{font-weight:500;font-size:0.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.track-meta{font-size:0.72rem;color:var(--muted);margin-top:2px}
+.progress-audio{width:100%;height:5px;border-radius:99px;background:rgba(200,180,220,.25);cursor:pointer;margin-top:8px;appearance:none;outline:none}
+.progress-audio::-webkit-slider-thumb{appearance:none;width:14px;height:14px;border-radius:50%;background:linear-gradient(135deg,var(--rose),var(--lavender));cursor:pointer}
+
+/* VOICE RECORDER */
+.recorder-area{display:flex;flex-direction:column;align-items:center;gap:16px;padding:8px 0}
+.mic-btn{width:78px;height:78px;border-radius:50%;border:none;cursor:pointer;background:linear-gradient(135deg,var(--rose),var(--lavender));display:grid;place-items:center;font-size:2rem;box-shadow:0 8px 28px rgba(180,150,200,.4);transition:all .2s}
+.mic-btn:hover{transform:scale(1.06)}
+.mic-btn.recording{background:linear-gradient(135deg,#f4a8a8,#e07070);animation:pulse-mic 1.2s ease-in-out infinite}
+@keyframes pulse-mic{0%{box-shadow:0 0 0 0 rgba(240,100,100,.5)}70%{box-shadow:0 0 0 22px rgba(240,100,100,0)}100%{box-shadow:0 0 0 0 rgba(240,100,100,0)}}
+.rec-status{font-size:0.82rem;color:var(--muted);text-align:center}
+.rec-timer{font-family:'Playfair Display',serif;font-size:2rem;color:var(--dark);min-width:80px;text-align:center}
+
+/* STORY */
+.story-text{font-family:'Playfair Display',serif;font-style:italic;font-size:1rem;line-height:1.75;color:var(--dark);border-left:3px solid var(--rose);padding-left:18px;display:none}
+.story-text.show{display:block}
+
+/* CHAKRA */
+.chakra-map{display:flex;flex-direction:column;align-items:center;gap:10px;padding:8px 0}
+.chakra-node{display:flex;align-items:center;gap:14px;padding:10px 18px;border-radius:99px;width:100%;background:rgba(255,255,255,.5);border:2px solid transparent;transition:all .2s;cursor:pointer}
+.chakra-node:hover,.chakra-node.active{background:rgba(255,255,255,.9);border-color:rgba(200,180,220,.6);box-shadow:var(--shadow)}
+.chakra-dot{width:16px;height:16px;border-radius:50%;flex-shrink:0}
+.chakra-name{font-size:0.83rem;font-weight:500;flex:1}
+.chakra-raga{font-size:0.7rem;color:var(--muted)}
+
+/* STATUS */
+.spinner{width:20px;height:20px;border-radius:50%;border:2.5px solid rgba(180,150,200,.3);border-top-color:var(--muted);animation:spin .7s linear infinite;display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner.show{display:inline-block}
+.status-msg{font-size:0.78rem;padding:7px 13px;border-radius:12px;display:none;align-items:center;gap:6px}
+.status-msg.show{display:inline-flex}
+.status-msg.error{background:rgba(244,180,180,.35);color:#8b3a3a}
+.status-msg.success{background:rgba(197,232,217,.5);color:#2d6a4f}
+
+/* HISTORY */
+.history-item{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:16px;background:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.85);cursor:pointer;transition:all .2s}
+.history-item:hover{background:rgba(255,255,255,.9);transform:translateX(3px)}
+</style>
+</head>
+<body>
+<div class="orbs">
+  <div class="orb orb1"></div><div class="orb orb2"></div>
+  <div class="orb orb3"></div><div class="orb orb4"></div>
+</div>
+
+<div class="shell">
+<aside>
+  <div class="logo"><div class="logo-icon">🌸</div>SoulSync</div>
+
+  <span class="nav-label">Heal</span>
+  <button class="nav-item active" onclick="showPage('text-page',this)"><span class="nav-icon">✍️</span> Text Analysis</button>
+  <button class="nav-item" onclick="showPage('voice-page',this)"><span class="nav-icon">🎙️</span> Voice Mood</button>
+  <button class="nav-item" onclick="showPage('story-page',this)"><span class="nav-icon">📖</span> Story Healer</button>
+
+  <span class="nav-label">Explore</span>
+  <button class="nav-item" onclick="showPage('chakra-page',this)"><span class="nav-icon">🔮</span> Chakra Map</button>
+  <button class="nav-item" onclick="showPage('history-page',this)"><span class="nav-icon">🕰️</span> History</button>
+
+  <div class="sidebar-spacer"></div>
+
+  <div class="api-config">
+    <div class="api-label">⚙️ Backend URL</div>
+    <input class="api-input" id="baseUrl" value="http://127.0.0.1:8000" />
+    <div style="font-size:0.65rem;color:var(--muted);margin-top:5px">Change to your Render/deploy URL</div>
+  </div>
+</aside>
+
+<main>
+  <div class="topbar">
+    <div>
+      <div class="greeting">Your <em>healing</em> sanctuary</div>
+      <div style="font-size:0.8rem;color:var(--muted);margin-top:3px">Chakra · Raga · Story — tuned to your soul</div>
+    </div>
+  </div>
+
+  <div class="main-tabs">
+    <button class="tab active" onclick="showPage('text-page',null,this)">✍️ Text</button>
+    <button class="tab" onclick="showPage('voice-page',null,this)">🎙️ Voice</button>
+    <button class="tab" onclick="showPage('story-page',null,this)">📖 Story</button>
+    <button class="tab" onclick="showPage('chakra-page',null,this)">🔮 Chakra</button>
+    <button class="tab" onclick="showPage('history-page',null,this)">🕰️ History</button>
+  </div>
+
+  <div class="content">
+
+    <!-- TEXT ANALYSIS PAGE -->
+    <div class="page active" id="text-page">
+      <div class="card">
+        <div class="card-title">How are you feeling?</div>
+        <div class="card-sub">Describe your emotions — we'll detect your mood and prescribe a healing raga</div>
+        <textarea class="text-input" id="moodText" placeholder="e.g. I've been feeling really stressed and anxious today, my mind won't stop racing…"></textarea>
+        <div style="display:flex;align-items:center;gap:12px;margin-top:14px">
+          <button class="btn btn-primary" id="analyzeBtn" onclick="analyzeText()">
+            <span id="analyzeBtnTxt">✨ Analyze Mood</span>
+            <div class="spinner" id="analyzeSpinner"></div>
+          </button>
+          <div class="status-msg" id="textStatus"></div>
+        </div>
+        <div style="font-size:0.72rem;color:var(--muted);margin-top:10px">Tip: Ctrl+Enter to analyze</div>
+      </div>
+
+      <div class="result-card" id="textResult">
+        <div class="mood-badge" id="moodBadge">😌 —</div>
+        <div class="result-grid">
+          <div class="result-item">
+            <div class="result-item-icon" id="ri-mood-icon">🌸</div>
+            <div class="result-item-label">Detected Mood</div>
+            <div class="result-item-val" id="ri-mood-val">—</div>
+          </div>
+          <div class="result-item">
+            <div class="result-item-icon">🔮</div>
+            <div class="result-item-label">Chakra</div>
+            <div class="result-item-val" id="ri-chakra">—</div>
+          </div>
+          <div class="result-item">
+            <div class="result-item-icon">🎵</div>
+            <div class="result-item-label">Healing Raga</div>
+            <div class="result-item-val" id="ri-raga">—</div>
+          </div>
+        </div>
+        <div class="audio-player">
+          <button class="play-circle" id="playBtn" onclick="toggleAudio('audioEl','playBtn')">▶</button>
+          <div class="track-info">
+            <div class="track-name" id="trackName">Your healing raga</div>
+            <div class="track-meta" id="trackMeta">Chakra soundscape</div>
+            <input type="range" class="progress-audio" id="audioProgress" value="0" min="0" max="100" oninput="seekAudio(this.value)">
+          </div>
+        </div>
+        <audio id="audioEl" ontimeupdate="updateProgress()" onended="document.getElementById('playBtn').textContent='▶'"></audio>
+      </div>
+    </div>
+
+    <!-- VOICE PAGE -->
+    <div class="page" id="voice-page">
+      <div class="card">
+        <div class="card-title">Speak your feelings</div>
+        <div class="card-sub">Record your voice — we'll transcribe it and detect your mood</div>
+        <div class="recorder-area">
+          <div class="rec-timer" id="recTimer">0:00</div>
+          <button class="mic-btn" id="micBtn" onclick="toggleRecording()">🎙️</button>
+          <div class="rec-status" id="recStatus">Tap the mic to start recording</div>
+        </div>
+        <div id="audioPreview" style="margin-top:10px;display:none">
+          <audio id="recordedAudio" controls style="width:100%;border-radius:12px;margin-bottom:10px"></audio>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;justify-content:center">
+          <button class="btn btn-primary" id="sendVoiceBtn" onclick="sendVoice()" disabled>
+            <span id="sendVoiceTxt">📤 Analyze Voice</span>
+            <div class="spinner" id="voiceSpinner"></div>
+          </button>
+          <div class="status-msg" id="voiceStatus"></div>
+        </div>
+      </div>
+      <div class="result-card" id="voiceResult">
+        <div class="mood-badge" id="v-moodBadge">🌸 —</div>
+        <div style="font-size:0.82rem;color:var(--muted);margin-bottom:16px;padding:12px 16px;background:rgba(255,255,255,.5);border-radius:12px;font-style:italic;line-height:1.6" id="v-transcript">Transcribed text will appear here</div>
+        <div class="result-grid">
+          <div class="result-item">
+            <div class="result-item-icon" id="v-ri-icon">🌸</div>
+            <div class="result-item-label">Detected Mood</div>
+            <div class="result-item-val" id="v-ri-mood">—</div>
+          </div>
+          <div class="result-item">
+            <div class="result-item-icon">🔮</div>
+            <div class="result-item-label">Chakra</div>
+            <div class="result-item-val" id="v-ri-chakra">—</div>
+          </div>
+          <div class="result-item">
+            <div class="result-item-icon">🎵</div>
+            <div class="result-item-label">Healing Raga</div>
+            <div class="result-item-val" id="v-ri-raga">—</div>
+          </div>
+        </div>
+        <div class="audio-player">
+          <button class="play-circle" id="v-playBtn" onclick="toggleAudio('v-audioEl','v-playBtn')">▶</button>
+          <div class="track-info">
+            <div class="track-name" id="v-trackName">Your healing raga</div>
+            <div class="track-meta">Voice-detected soundscape</div>
+          </div>
+        </div>
+        <audio id="v-audioEl" onended="document.getElementById('v-playBtn').textContent='▶'"></audio>
+      </div>
+    </div>
+
+    <!-- STORY PAGE -->
+    <div class="page" id="story-page">
+      <div class="card">
+        <div class="card-title">Panchatantra Story Healer</div>
+        <div class="card-sub">Choose your mood — receive a personalized healing story with AI narration</div>
+        <div class="row3" style="margin-bottom:18px" id="moodBtns">
+          <button class="btn btn-secondary" id="s-stressed" onclick="selectMood('stressed',this)">😰 Stressed</button>
+          <button class="btn btn-secondary" id="s-sad" onclick="selectMood('sad',this)">😔 Sad</button>
+          <button class="btn btn-secondary" id="s-happy" onclick="selectMood('happy',this)">😊 Happy</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <button class="btn btn-primary" id="storyBtn" onclick="fetchStory()">
+            <span id="storyBtnTxt">📖 Generate Story</span>
+            <div class="spinner" id="storySpinner"></div>
+          </button>
+          <div class="status-msg" id="storyStatus"></div>
+        </div>
+      </div>
+      <div class="result-card" id="storyResult">
+        <div class="card-title" style="margin-bottom:14px">🌿 Your Healing Story</div>
+        <div class="story-text show" id="storyContent"></div>
+        <div style="margin-top:20px">
+          <div class="audio-player">
+            <button class="play-circle" id="s-playBtn" onclick="toggleAudio('s-audioEl','s-playBtn')">▶</button>
+            <div class="track-info">
+              <div class="track-name">Story Narration</div>
+              <div class="track-meta">AI voice · gTTS · auto-generated</div>
+            </div>
+          </div>
+          <audio id="s-audioEl" onended="document.getElementById('s-playBtn').textContent='▶'"></audio>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHAKRA PAGE -->
+    <div class="page" id="chakra-page">
+      <div class="row">
+        <div class="card">
+          <div class="card-title">Chakra & Raga Map</div>
+          <div class="card-sub">Each mood maps to a chakra and its healing raga — click to play</div>
+          <div class="chakra-map">
+            <div class="chakra-node" data-mood="stressed" onclick="selectChakra('stressed')">
+              <div class="chakra-dot" style="background:#b39ddb"></div>
+              <div><div class="chakra-name">Crown — Sahasrara</div><div class="chakra-raga">Raga Yaman · stressed mind</div></div>
+              <span>😰</span>
+            </div>
+            <div class="chakra-node" data-mood="sad" onclick="selectChakra('sad')">
+              <div class="chakra-dot" style="background:#ef9a9a"></div>
+              <div><div class="chakra-name">Heart — Anahata</div><div class="chakra-raga">Raga Darbari · grief & longing</div></div>
+              <span>😔</span>
+            </div>
+            <div class="chakra-node" data-mood="happy" onclick="selectChakra('happy')">
+              <div class="chakra-dot" style="background:#fff176"></div>
+              <div><div class="chakra-name">Solar Plexus — Manipura</div><div class="chakra-raga">Raga Bilawal · joy & energy</div></div>
+              <span>😊</span>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Raga Preview</div>
+          <div class="card-sub">Click a chakra to load its healing soundscape</div>
+          <div id="chakraDetail" style="text-align:center;padding:18px;color:var(--muted);font-style:italic;font-size:0.88rem;line-height:1.6">
+            Select a chakra node on the left
+          </div>
+          <div class="audio-player" id="chakraPlayer" style="display:none;margin-top:auto">
+            <button class="play-circle" id="c-playBtn" onclick="toggleAudio('c-audioEl','c-playBtn')">▶</button>
+            <div class="track-info">
+              <div class="track-name" id="c-trackName">—</div>
+              <div class="track-meta" id="c-trackMeta">Healing raga</div>
+            </div>
+          </div>
+          <audio id="c-audioEl" onended="document.getElementById('c-playBtn').textContent='▶'"></audio>
+        </div>
+      </div>
+    </div>
+
+    <!-- HISTORY PAGE -->
+    <div class="page" id="history-page">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+          <div>
+            <div class="card-title">Session History</div>
+            <div class="card-sub" style="margin-bottom:0">Your past mood analyses</div>
+          </div>
+          <button class="btn btn-secondary" style="font-size:0.78rem;padding:7px 14px" onclick="clearHistory()">🗑 Clear</button>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px" id="historyList"></div>
+      </div>
+    </div>
+
+  </div>
+</main>
+</div>
+
+<script>
+/* ─── UTILS ─── */
+const API = () => document.getElementById('baseUrl').value.replace(/\/$/,'');
+const EMOJI = {stressed:'😰',sad:'😔',happy:'😊'};
+const COLORS = {stressed:'rgba(221,212,240,.55)',sad:'rgba(244,197,197,.55)',happy:'rgba(249,223,193,.55)'};
+const cap = s => s ? s[0].toUpperCase()+s.slice(1) : s;
+
+function setStatus(id,type,msg){
+  const el=document.getElementById(id);
+  el.className=`status-msg ${type} show`;
+  el.innerHTML=(type==='error'?'⚠️ ':'✓ ')+msg;
+  if(type==='success') setTimeout(()=>el.classList.remove('show'),3000);
+}
+function setLoading(btn,spinner,txt,on){
+  document.getElementById(btn).disabled=on;
+  document.getElementById(spinner).classList.toggle('show',on);
+  document.getElementById(txt).style.opacity=on?0:1;
+}
+
+/* ─── NAV ─── */
+const pages = ['text-page','voice-page','story-page','chakra-page','history-page'];
+function showPage(id, navBtn, tabBtn){
+  pages.forEach(p=>document.getElementById(p).classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  const idx=pages.indexOf(id);
+  document.querySelectorAll('.nav-item').forEach((n,i)=>n.classList.toggle('active',i===idx));
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',i===idx));
+}
+
+/* ─── AUDIO GENERIC TOGGLE ─── */
+function toggleAudio(audioId, btnId){
+  const audio=document.getElementById(audioId);
+  const btn=document.getElementById(btnId);
+  if(!audio.src||audio.src===window.location.href) return;
+  if(audio.paused){audio.play().catch(()=>{});btn.textContent='⏸';}
+  else{audio.pause();btn.textContent='▶';}
+}
+function updateProgress(){
+  const a=document.getElementById('audioEl');
+  if(a.duration) document.getElementById('audioProgress').value=(a.currentTime/a.duration)*100;
+}
+function seekAudio(v){
+  const a=document.getElementById('audioEl');
+  if(a.duration) a.currentTime=(v/100)*a.duration;
+}
+
+/* ─── TEXT ANALYSIS → /analyze-text ─── */
+async function analyzeText(){
+  const text=document.getElementById('moodText').value.trim();
+  if(!text){setStatus('textStatus','error','Please enter some text');return;}
+  document.getElementById('textStatus').classList.remove('show');
+  setLoading('analyzeBtn','analyzeSpinner','analyzeBtnTxt',true);
+  try{
+    const res=await fetch(API()+'/analyze-text',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({text})
+    });
+    if(!res.ok) throw new Error(`Server ${res.status}`);
+    const d=await res.json();
+    populateResult(d,'textResult','moodBadge','ri-mood-icon','ri-mood-val','ri-chakra','ri-raga','audioEl','trackName','trackMeta','playBtn');
+    document.getElementById('audioProgress').value=0;
+    saveHistory({...d, inputText:text});
+    setStatus('textStatus','success','Analysis complete');
+  }catch(e){
+    setStatus('textStatus','error',e.message.includes('fetch')?'Cannot reach backend — check the URL':'Server error: '+e.message);
+  }finally{
+    setLoading('analyzeBtn','analyzeSpinner','analyzeBtnTxt',false);
+  }
+}
+
+function populateResult(d,cardId,badgeId,iconId,moodId,chakraId,ragaId,audioId,nameId,metaId,btnId){
+  const card=document.getElementById(cardId);
+  card.classList.add('show');
+  card.style.background=`linear-gradient(135deg,${COLORS[d.mood]||'rgba(221,212,240,.55)'},rgba(200,223,245,.45))`;
+  document.getElementById(badgeId).textContent=`${EMOJI[d.mood]||'🌸'} ${cap(d.mood)}`;
+  document.getElementById(iconId).textContent=EMOJI[d.mood]||'🌸';
+  document.getElementById(moodId).textContent=cap(d.mood);
+  document.getElementById(chakraId).textContent=d.chakra;
+  document.getElementById(ragaId).textContent=d.raga;
+  document.getElementById(nameId).textContent=`Raga ${d.raga}`;
+  document.getElementById(metaId).textContent=`${d.chakra} · healing soundscape`;
+  document.getElementById(audioId).src=d.audio;
+  document.getElementById(btnId).textContent='▶';
+}
+
+document.getElementById('moodText').addEventListener('keydown',e=>{if(e.ctrlKey&&e.key==='Enter') analyzeText();});
+
+/* ─── VOICE RECORDER → /speech-mood ─── */
+let mediaRecorder,recChunks=[],recInterval,recSecs=0,recBlob=null;
+
+async function toggleRecording(){
+  const btn=document.getElementById('micBtn');
+  if(!mediaRecorder||mediaRecorder.state==='inactive'){
+    try{
+      const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+      mediaRecorder=new MediaRecorder(stream);
+      recChunks=[];
+      mediaRecorder.ondataavailable=e=>{if(e.data.size>0)recChunks.push(e.data);};
+      mediaRecorder.onstop=()=>{
+        recBlob=new Blob(recChunks,{type:'audio/webm'});
+        document.getElementById('recordedAudio').src=URL.createObjectURL(recBlob);
+        document.getElementById('audioPreview').style.display='block';
+        document.getElementById('sendVoiceBtn').disabled=false;
+        document.getElementById('recStatus').textContent='Recording ready — click Analyze Voice';
+      };
+      mediaRecorder.start();
+      btn.classList.add('recording');btn.textContent='⏹';
+      document.getElementById('recStatus').textContent='Recording in progress…';
+      recSecs=0;
+      recInterval=setInterval(()=>{
+        recSecs++;
+        document.getElementById('recTimer').textContent=`${Math.floor(recSecs/60)}:${String(recSecs%60).padStart(2,'0')}`;
+      },1000);
+    }catch{document.getElementById('recStatus').textContent='Microphone access denied';}
+  }else{
+    mediaRecorder.stop();
+    mediaRecorder.stream.getTracks().forEach(t=>t.stop());
+    btn.classList.remove('recording');btn.textContent='🎙️';
+    clearInterval(recInterval);
+  }
+}
+
+async function sendVoice(){
+  if(!recBlob){setStatus('voiceStatus','error','No recording');return;}
+  document.getElementById('voiceStatus').classList.remove('show');
+  setLoading('sendVoiceBtn','voiceSpinner','sendVoiceTxt',true);
+  try{
+    const form=new FormData();
+    form.append('file',recBlob,'recording.webm');
+    const res=await fetch(API()+'/speech-mood',{method:'POST',body:form});
+    if(!res.ok) throw new Error(`Server ${res.status}`);
+    const d=await res.json();
+    document.getElementById('v-transcript').textContent=`"${d.text||'No speech detected'}"`;
+    populateResult(d,'voiceResult','v-moodBadge','v-ri-icon','v-ri-mood','v-ri-chakra','v-ri-raga','v-audioEl','v-trackName','v-trackMeta-ignore','v-playBtn');
+    // fix meta for voice card
+    saveHistory({...d, inputText:d.text||'[voice]'});
+    setStatus('voiceStatus','success','Voice analyzed!');
+  }catch(e){
+    setStatus('voiceStatus','error',e.message.includes('fetch')?'Cannot reach backend':e.message);
+  }finally{
+    setLoading('sendVoiceBtn','voiceSpinner','sendVoiceTxt',false);
+  }
+}
+
+/* ─── STORY → /story ─── */
+let storyMood='stressed';
+function selectMood(mood,btn){
+  storyMood=mood;
+  document.querySelectorAll('#moodBtns .btn').forEach(b=>{b.style.borderColor='transparent';b.style.background='rgba(255,255,255,.75)';});
+  btn.style.borderColor='rgba(180,150,200,.55)';btn.style.background='rgba(255,255,255,.95)';
+}
+
+async function fetchStory(){
+  document.getElementById('storyStatus').classList.remove('show');
+  setLoading('storyBtn','storySpinner','storyBtnTxt',true);
+  try{
+    const res=await fetch(API()+'/story',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({mood:storyMood})
+    });
+    if(!res.ok) throw new Error(`Server ${res.status}`);
+    const d=await res.json();
+    document.getElementById('storyContent').textContent=d.story;
+    const card=document.getElementById('storyResult');
+    card.classList.add('show');
+    card.style.background=`linear-gradient(135deg,${COLORS[storyMood]||'rgba(221,212,240,.55)'},rgba(200,223,245,.45))`;
+    document.getElementById('s-audioEl').src=d.audio;
+    document.getElementById('s-playBtn').textContent='▶';
+    setStatus('storyStatus','success','Story ready!');
+  }catch(e){
+    setStatus('storyStatus','error',e.message.includes('fetch')?'Cannot reach backend':e.message);
+  }finally{
+    setLoading('storyBtn','storySpinner','storyBtnTxt',false);
+  }
+}
+
+/* ─── CHAKRA MAP ─── */
+const CHAKRA_INFO = {
+  stressed:{name:'Raga Yaman',chakra:'Crown — Sahasrara',desc:'Yaman is an evening raga of immense beauty and calm. Its slow, deliberate phrases quiet the overworked Crown chakra, dissolving anxiety and mental chatter.',file:'yaman'},
+  sad:{name:'Raga Darbari',chakra:'Heart — Anahata',desc:'Darbari Kanada moves through grief with profound dignity. It speaks directly to the Heart chakra, transforming loneliness and sorrow into gentle acceptance.',file:'darbari'},
+  happy:{name:'Raga Bilawal',chakra:'Solar Plexus — Manipura',desc:'Bilawal is a sunrise raga of brightness and warmth. It energises the Solar Plexus chakra, amplifying joy, confidence, and inner strength.',file:'bilawal'},
+};
+function selectChakra(mood){
+  document.querySelectorAll('.chakra-node').forEach(n=>n.classList.toggle('active',n.dataset.mood===mood));
+  const d=CHAKRA_INFO[mood];
+  document.getElementById('chakraDetail').innerHTML=`
+    <div style="font-family:'Playfair Display',serif;font-size:1.1rem;margin-bottom:6px">${d.name}</div>
+    <div style="font-size:0.78rem;color:var(--muted);margin-bottom:12px">${d.chakra}</div>
+    <div style="font-size:0.83rem;line-height:1.65;font-style:italic;text-align:left">${d.desc}</div>
+  `;
+  document.getElementById('chakraPlayer').style.display='flex';
+  document.getElementById('c-trackName').textContent=d.name;
+  document.getElementById('c-trackMeta').textContent=d.chakra;
+  document.getElementById('c-audioEl').src=`${API()}/audio/${d.file}.mp3`;
+  document.getElementById('c-playBtn').textContent='▶';
+}
+
+/* ─── HISTORY (localStorage) ─── */
+function saveHistory(d){
+  const h=JSON.parse(localStorage.getItem('ss_history')||'[]');
+  h.unshift({text:(d.inputText||'').substring(0,80),mood:d.mood,chakra:d.chakra,raga:d.raga,time:new Date().toLocaleString()});
+  if(h.length>30) h.pop();
+  localStorage.setItem('ss_history',JSON.stringify(h));
+  renderHistory();
+}
+function renderHistory(){
+  const h=JSON.parse(localStorage.getItem('ss_history')||'[]');
+  const list=document.getElementById('historyList');
+  if(!h.length){list.innerHTML='<div style="text-align:center;padding:28px;color:var(--muted);font-style:italic;font-size:0.88rem">No sessions yet. Analyze a mood to see it here.</div>';return;}
+  list.innerHTML=h.map(item=>`
+    <div class="history-item">
+      <div style="font-size:1.4rem;flex-shrink:0">${EMOJI[item.mood]||'🌸'}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:0.85rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${item.text||'—'}</div>
+        <div style="font-size:0.7rem;color:var(--muted);margin-top:2px">${item.time}</div>
+      </div>
+      <div style="text-align:right;flex-shrink:0">
+        <div style="font-size:0.75rem;color:var(--muted);font-style:italic">${item.raga}</div>
+        <div style="font-size:0.65rem;color:var(--muted);margin-top:2px">${(item.chakra||'').split(' ')[0]}</div>
+      </div>
+    </div>
+  `).join('');
+}
+function clearHistory(){localStorage.removeItem('ss_history');renderHistory();}
+
+/* ─── INIT ─── */
+renderHistory();
+selectMood('stressed', document.getElementById('s-stressed'));
+</script>
+</body>
+</html>

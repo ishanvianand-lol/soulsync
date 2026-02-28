@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+textblob
+google-generativeai
+SpeechRecognition
+pydub
+python-multipart
+gtts
