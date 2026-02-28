@@ -14,10 +14,6 @@ from storyteller import generate_story_with_voice
 # ── Config ──────────────────────────────────────────────
 BASE_URL = os.getenv("BASE_URL", "http://127.0.0.1:8000")
 
-# Ensure required directories exist on startup
-os.makedirs("audio", exist_ok=True)
-os.makedirs("stories", exist_ok=True)
-os.makedirs("temp", exist_ok=True)
 
 # ── App ──────────────────────────────────────────────────
 app = FastAPI(
@@ -78,13 +74,11 @@ def analyze_text(data: TextInput):
     mood = detect_mood(text)
     return build_mood_response(text, mood)
 
-
 @app.post("/speech-mood")
 async def speech_mood(file: UploadFile = File(...)):
-    """Transcribe uploaded audio, detect mood, return chakra + raga info."""
-    # Save to a unique temp file so concurrent requests don't collide
     ext = os.path.splitext(file.filename or "audio")[-1] or ".webm"
-    temp_path = f"temp/{uuid.uuid4().hex}{ext}"
+    temp_dir = "/tmp"
+    temp_path = os.path.join(temp_dir, f"{uuid.uuid4().hex}{ext}")
 
     try:
         with open(temp_path, "wb") as buf:
@@ -98,10 +92,8 @@ async def speech_mood(file: UploadFile = File(...)):
         raise HTTPException(status_code=500, detail=f"Speech processing failed: {str(e)}")
 
     finally:
-        # Always clean up the temp file
         if os.path.exists(temp_path):
             os.remove(temp_path)
-
 
 @app.post("/story")
 def story(data: MoodInput):
